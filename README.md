@@ -1,31 +1,80 @@
 # CRUD MEAN App - Full Deployment
 
 ## 🚀 Project Overview
-Short description…
+This project demonstrates a complete end-to-end deployment of a MEAN stack CRUD application using Docker, Docker Hub, Nginx Reverse Proxy, GitHub Actions CI/CD pipeline, and deployment on an AWS EC2 Ubuntu server.
 
 ## 🗂️ Tech Stack
 • MongoDB • Express.js • Angular • Node.js  
 • Docker • Nginx • GitHub Actions • AWS EC2
 
 ## 📦 Features
-• CRUD users  
-• Containerized deployment  
-• Automated CI/CD
+🔹 Add / Edit / Delete / View Users
+
+🔹 Fully Dockerized frontend + backend + database
+
+🔹 Automated Deployment via GitHub Actions
+
+🔹 Secured Nginx Reverse Proxy routing everything via port 80
 
 ## 🔧 Folder Structure
 (frontend, backend, docker-compose…)
 
-## 🐳 Docker Setup
-Commands used to build/push images…
+## Docker Setup
+🔹 Build & Push Backend
+docker build -t <dockerhub-username>/mean-backend ./backend
+docker push <dockerhub-username>/mean-backend
 
-## ☁️ Cloud Deployment
-AWS EC2 details + Docker Compose file
+🔹 Build & Push Frontend
+docker build -t <dockerhub-username>/mean-frontend ./frontend
+docker push <dockerhub-username>/mean-frontend
 
-## 🔐 Nginx Reverse Proxy
-Config file example
+## Deployment on AWS EC2
 
-## 🤖 CI/CD with GitHub Actions
-Workflow file + explanation
+Launch a Ubuntu EC2 instance → Install Docker & Docker Compose → Clone repo:
+
+git clone https://github.com/<your-username>/crud-dd-task-mean-app.git
+cd crud-dd-task-mean-app
+docker compose up -d
+
+
+## Nginx Reverse Proxy
+
+Location: /etc/nginx/sites-available/default
+
+server {
+    listen 80;
+
+    location / {
+        proxy_pass http://frontend:80;
+    }
+
+    location /api/ {
+        proxy_pass http://backend:3000/;
+    }
+}
+
+
+Restart:
+
+sudo systemctl restart nginx
+sudo systemctl status nginx
+
+## CI/CD – GitHub Actions Workflow
+
+Every push to main triggers:
+
+✔ Build → ✔ Push Docker Images → ✔ SSH Deploy
+
+File: .github/workflows/ci-cd.yml
+
+Secrets Used:
+
+DOCKERHUB_USERNAME	Docker Hub login
+DOCKERHUB_TOKEN	Access token
+SERVER_IP	EC2 Public IP
+SERVER_SSH_KEY	Private SSH Key contents
+
+Pipeline = fully automated deployment.
 
 ## 📸 Screenshots
 CI/CD configuration and execution.
