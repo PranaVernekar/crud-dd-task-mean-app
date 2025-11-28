@@ -37,19 +37,20 @@ jobs:
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/mean-frontend
 
   deploy:
-  runs-on: ubuntu-latest
-  needs: build
+    runs-on: ubuntu-latest
+    needs: build
 
-  steps:
-    - name: Deploy to Server via SSH
-      uses: appleboy/ssh-action@v0.5.0
-      with:
-        host: ${{ secrets.SERVER_IP }}
-        username: ubuntu
-        key: ${{ secrets.SERVER_SSH_KEY }}
-        script: |
-          cd ~/crud-dd-task-mean-app
-          git reset --hard
-          git pull origin main
-          docker compose pull
-          docker compose up -d --build
+    steps:
+      # 6️⃣ SSH into the VM and deploy using Docker Compose
+      - name: Deploy to Server via SSH
+        uses: appleboy/ssh-action@v0.1.9
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ubuntu
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            cd ~/crud-dd-task-mean-app
+            git reset --hard
+            git pull origin main
+            docker compose pull
+            docker compose up -d --build
