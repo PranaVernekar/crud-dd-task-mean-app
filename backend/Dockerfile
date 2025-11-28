@@ -4,7 +4,7 @@ WORKDIR /usr/src/app
 
 # copy package files first for caching
 COPY package*.json ./
-RUN npm ci --only=production
+RUN npm install --omit=dev
 
 # copy rest
 COPY . .
