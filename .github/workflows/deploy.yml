@@ -1,0 +1,49 @@
+name: CI/CD MEAN App
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repo
+      uses: actions/checkout@v3
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.pranavvernekar }}
+        password: ${{ secrets.dckr_pat_aiIAjWKpfftDuw_Sjs5xP3KbjcA }}
+
+    - name: Build & Push Backend Image
+      run: |
+        docker build -t ${{ secrets.pranavvernekar }}/mean-backend ./backend
+        docker push ${{ secrets.pranavvernekar }}/mean-backend
+
+    - name: Build & Push Frontend Image
+      run: |
+        docker build -t ${{ secrets.pranavvernekar }}/mean-frontend ./frontend
+        docker push ${{ secrets.pranavvernekar }}/mean-frontend
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+    - name: Deploy to Server via SSH
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.43.204.109.5 }}
+        username: ubuntu
+        key: ${{ secrets.-----BEGIN RSA PRIVATE KEY----- MIIEogIBAAKCAQEAs6nwZ4Pleg294dNJGtl2Vssu96iL4AMLQd/ITpP8GfvxxK+G B59UmbRZwobdOcS5yO+0VUCOBs9VJmX3h6Ft1Zvu8q4DLVxse9I7IR9KVzN39cZw ehXIfsJsFJFTMtMbzq42UVAXtbxoegoKWDtpvQaCG3UVmO+/VasQ9dqNzOOieicj Jq9pzJjEfjVoOirndF37um2lp+8MDsJcDv+1V+nfOMFP9rAAZXyjNC/8GEb4/GaP mqZI2QYac3yglYJyfcGwy/ZQFt++GEfxYiRTxT2RZXuM9iorUpkF9N71F3LCA498 kkQYkFtBoVwUb+bLTn800zz4JevWUFjpqU/9JwIDAQABAoIBAH+2GzfaIDNEtWdj g6HcVyyXPgm5+8P/Je9rnb2NoDTwTQndI08jyUWBWBTZPUSlPNNC4VOAkfTxSLwE 25HEBIlFUPOdEpEaE9tos7N1xKh745gHuUhvV5gTqDRuoU+NlUSzvdTLNC9xgGrP 3E6f3SgLCk1uSy3trnq9IU9CTm4HaN+D13tk/e/l9JxrsqXHJRpsmeK+9EfsQpQ5 y81BtwUK/vPfaKzq+iitL/vxYisBnqoFKTYHMSRc5Y/mh6oepAo7CkItXN9GgkSb cuuf9wSl+X08WevezH/j131QwNp7r5wsdyddTTnie7aEBnK3r/t/tqeZDZ+cvqwp kq6ET9ECgYEA4V2owjdbmCPuD1Na4qEdUEK2uzOpyKHVMrHeuw1YXu2B6NZNRvIq +CIvecUJ+eGXQyVhtA6TyVwmvddwyxZKNfMg1sEHqOeuepQfLI9xzJEgjBi+Hs8a KyAVAIKqHUdR7THjL8nHtit12VcLStJTuS5q+7mDdvDjqWX5BaLZuCsCgYEAzBXt ryhuWoG6dERRFKnCeijc1CR2TFzu8I+boWhGIC9J3BRog6WkJrgiG9Uys7T03/fb /QoY5iQMM/7cUyLMrByNo0VN8f4foznJ4U3n+2bn2SfS8XQ46oU6T9hOX3M2U/1y j1eUJ0UleQjCVdlqp7hw4erO39eRPElA6kGeNPUCgYBBHAQDiGbH/6lpeBWL4CxN 4dhVIUnuEwM7UDQfKm3bjxa3JCLTWmebpJS+w3RsYwaGeahOkt+TjzIKKtIFen0a NRHJuZ7y52x7MYwIHbEs/si+cO+MixzuVKh8q0NmjhJXStBuIAe407mKfyFeDoHt wEFcVG5s0I+Vg0Z8oF3yXQKBgC3d68pG8u5CY65HwFU9hejAkEjZXQDyjfzguaB/ 9+q51gaxS3/y1T6ieX/53WhIDhTb9sQa5derWFbDO68vjgJMdISySb9OVrvve/C3 +qAk04yZh64eacBDawSQ36RSF26u8nVGwJRG1RIrpsl2kKLbL/uGMzJZl1mOORms 36qVAoGAE7YJ30UKmdVtH8Wa2Rgv6SAw4XMOWgJvrMRQNhBiRvrmCDyNm+VVZCsA MzT7vhDoQuPv042uZybWGgJ0xhOy6H0yfbEbIqvI1F6pGSp1ERs/O4F8wtl9ejGW IYV67TrM0uo3jrp982zqv6znDdnhA7XWsCtolYnLecZqq9SlGmk= -----END RSA PRIVATE KEY----- }}
+        script: |
+          cd crud-dd-task-mean-app
+          git pull
+          docker compose pull
+          docker compose up -d
