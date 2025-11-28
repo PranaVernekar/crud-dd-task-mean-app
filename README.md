@@ -27,3 +27,4 @@ You can modify the `src/app/services/tutorial.service.ts` file to adjust how the
 Navigate to `http://localhost:8081/`
 Test CI/CD pipeline
 Trigger CI/CD
+Trigger CI/CD workflow
